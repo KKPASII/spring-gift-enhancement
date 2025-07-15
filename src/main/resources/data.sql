@@ -4,4 +4,5 @@ INSERT INTO product (name, price, image_url) VALUES ('egg', 2000, 'https://cdn.p
 INSERT INTO member (email, password, role) VALUES ('ham@email.com', '$2a$10$ISTjRWOs8SFhtJzqvE9u5Oh3TwvQxnxsI8RmKFNeSlNZOxOKCLhx.', 'ADMIN');
 INSERT INTO member (email, password, role) VALUES ('dam@email.com', '$2a$10$ISTjRWOs8SFhtJzqvE9u5Oh3TwvQxnxsI8RmKFNeSlNZOxOKCLhx.', 'USER');
 
-INSERT INTO wish (member_id, product_id, quantity) VALUES (1, 1, 1);
+INSERT INTO wish (member_id, product_id, quantity) VALUES (2, 1, 1);
+INSERT INTO wish (member_id, product_id, quantity) VALUES (2, 2, 2);
