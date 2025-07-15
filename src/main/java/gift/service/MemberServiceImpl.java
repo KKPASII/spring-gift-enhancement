@@ -8,6 +8,7 @@ import gift.exception.DuplicatedEmailException;
 import gift.exception.LoginFailedException;
 import gift.repository.MemberRepository;
 import gift.util.JwtUtil;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public AuthToken register(AuthRequest request) {
         if (memberRepository.findByEmail(request.email()).isPresent()) {
             throw new DuplicatedEmailException("사용할 수 없는 이메일입니다.");
@@ -36,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AuthToken login(AuthRequest request) {
         Member member = memberRepository.findByEmail(request.email())
             .orElse(null);
@@ -48,6 +51,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Member> findByEmail(String email) {
         return memberRepository.findByEmail(email);
     }
