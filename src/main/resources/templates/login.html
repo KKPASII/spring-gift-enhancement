@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+    :root {
+      --bg-color: #f4f7fa;
+      --card-bg-color: #ffffff;
+      --primary-color: #6a82fb;
+      --primary-hover-color: #5468d4;
+      --text-color: #333;
+      --text-light-color: #777;
+      --border-color: #e9ecef;
+      --shadow-color: rgba(106, 130, 251, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login-card {
+      background-color: var(--card-bg-color);
+      padding: 2.5rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px var(--shadow-color);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-light-color);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: 'Nunito', sans-serif;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover-color);
+      transform: translateY(-2px);
+    }
+
+    .register-link {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-light-color);
+    }
+
+    .register-link a {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+      color: var(--primary-hover-color);
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-header">
+    <h1>로그인 페이지</h1>
+  </div>
+  <form id="login-form">
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="you@example.com" required>
+    </div>
+    <div class="form-group">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="••••••••" required>
+    </div>
+    <button type="submit" class="btn">로그인</button>
+  </form>
+  <div class="register-link">
+    <p>계정이 없으신가요? <a href="/register">회원가입</a></p>
+  </div>
+</div>
+
+<script>
+  document.getElementById('login-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+        alert('로그인에 성공했습니다! 관리자 페이지로 이동합니다.');
+        window.location.href = '/management/products';
+      } else {
+        const errorData = await response.json();
+        alert('로그인 실패: ' + (errorData.error));
+      }
+    } catch (error) {
+      console.error('로그인 요청 중 에러 발생:', error);
+      alert('로그인 요청 중 문제가 발생했습니다.');
+    }
+  });
+</script>
+
+</body>
+</html>
