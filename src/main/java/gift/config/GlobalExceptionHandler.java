@@ -1,4 +1,4 @@
-package gift.util;
+package gift.config;
 
 import gift.exception.DuplicatedEmailException;
 import gift.exception.InvalidProductNameException;
