@@ -9,7 +9,6 @@ import gift.exception.LoginFailedException;
 import gift.repository.MemberRepository;
 import gift.util.JwtUtil;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,12 +16,10 @@ import java.util.Optional;
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public MemberServiceImpl(MemberRepository memberRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public MemberServiceImpl(MemberRepository memberRepository, JwtUtil jwtUtil) {
         this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
@@ -32,8 +29,7 @@ public class MemberServiceImpl implements MemberService {
         if (memberRepository.findByEmail(request.email()).isPresent()) {
             throw new DuplicatedEmailException("사용할 수 없는 이메일입니다.");
         }
-        String encodedPassword = passwordEncoder.encode(request.password());
-        Member savedMember = memberRepository.save(new Member(request.email(), encodedPassword, Role.USER));
+        Member savedMember = memberRepository.save(new Member(request.email(), request.password(), Role.USER));
         return new AuthToken(jwtUtil.generateAccessToken(savedMember));
     }
 
@@ -43,7 +39,7 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByEmail(request.email())
             .orElse(null);
 
-        if (member == null || !passwordEncoder.matches(request.password(), member.getPassword())) {
+        if (member == null || !request.password().equals(member.getPassword())) {
             throw new LoginFailedException("이메일 또는 비밀번호가 틀렸습니다.");
         }
         String accessToken = jwtUtil.generateAccessToken(member);
