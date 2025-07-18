@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -28,40 +29,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String jwt = null;
+        String token = null;
+
+        // 헤더 확인
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
-            authHeader = authHeader.trim();
-        }
-
         if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-            jwt = authHeader.substring(BEARER_PREFIX.length());
+            token = authHeader.substring(BEARER_PREFIX.length());
         }
 
-        if (authHeader == null) {
-            Cookie[] cookies = request.getCookies();
-            if (cookies == null) {
-                throw new UnAuthenticatedException("인증 정보가 없습니다. (쿠키 없음)");
-            }
-
-            Optional<String> accessTokenCookie = Arrays.stream(cookies)
+        // 쿠키 확인
+        if (token == null && request.getCookies() != null) {
+            token = Arrays.stream(request.getCookies())
                 .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .map(cookie -> URLDecoder.decode(cookie.getValue()))
-                .findFirst();
-
-            if (accessTokenCookie.isEmpty()) {
-                throw new UnAuthenticatedException("인증 정보가 없습니다. (토큰 쿠키 없음)");
-            }
-            jwt = accessTokenCookie.get().substring(BEARER_PREFIX.length());
+                .findFirst()
+                .map(cookie -> { // 쿠키에서 토큰 추출
+                    try {
+                        String decodedValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                        if (decodedValue.startsWith(BEARER_PREFIX)) {
+                            return decodedValue.substring(BEARER_PREFIX.length());
+                        }
+                        return null;
+                    } catch (Exception e) {
+                        throw new UnAuthenticatedException(e.getMessage());
+                    }
+                })
+                .orElse(null);
         }
 
-        if (jwt == null) {
+        if (token == null) {
             throw new UnAuthenticatedException("인증 헤더가 없거나 'Bearer' 타입이 아닙니다.");
         }
 
-        Claims claims = jwtUtil.getClaims(jwt);
-        String roleString = claims.get("role", String.class);
-        if (roleString == null || !Role.valueOf(roleString).equals(Role.ADMIN)) {
+        Claims claims = jwtUtil.getClaims(token);
+        String role = claims.get("role", String.class);
+        if (role == null || !Role.valueOf(role).equals(Role.ADMIN)) {
             throw new UnAuthorizedException("해당 리소스에 접근할 권한이 없습니다.");
         }
 
