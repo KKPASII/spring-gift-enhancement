@@ -1,15 +1,24 @@
 package gift.entity;
 
 import gift.dto.ProductRequestDto;
+import jakarta.persistence.*;
 
+@Entity
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name", nullable = false, length = 15)
     private String name;
+
+    @Column(name = "price", nullable = false)
     private int price;
+
+    @Column(name = "image_url", nullable = false, length = 1024)
     private String imageUrl;
 
-    public Product() {
-    }
+    protected Product() {}
 
     public Product(String name, int price, String imageUrl) {
         this.name = name;
@@ -26,10 +35,6 @@ public class Product {
 
     public Long getId() {
         return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {

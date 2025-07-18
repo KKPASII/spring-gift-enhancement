@@ -30,7 +30,7 @@ public class WishRestController {
         @RequestBody CreateWishRequest request,
         @LoginMember Member member
     ) {
-        return new ResponseEntity<>(wishService.create(member.getId(), request), HttpStatus.CREATED);
+        return new ResponseEntity<>(wishService.create(member, request), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{wishId}")
@@ -38,7 +38,7 @@ public class WishRestController {
         @PathVariable("wishId") Long wishId,
         @LoginMember Member member
     ) {
-        wishService.deleteWish(member.getId(), wishId);
+        wishService.deleteWish(wishId, member.getId());
         return ResponseEntity.noContent().build();
     }
 }
