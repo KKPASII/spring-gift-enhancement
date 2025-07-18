@@ -5,6 +5,8 @@ import gift.dto.ProductResponseDto;
 import gift.entity.Product;
 import gift.repository.ProductRepository;
 import gift.validator.ProductValidator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -66,5 +68,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteAllProducts() {
         productRepository.deleteAll();
+    }
+
+    @Override
+    public Page<ProductResponseDto> findAll(Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
+        return products.map(ProductResponseDto::new);
     }
 }

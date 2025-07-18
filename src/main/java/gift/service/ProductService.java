@@ -2,6 +2,8 @@ package gift.service;
 
 import gift.dto.ProductRequestDto;
 import gift.dto.ProductResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,4 +19,6 @@ public interface ProductService {
     void deleteProductById(Long id);
 
     void deleteAllProducts();
+
+    Page<ProductResponseDto> findAll(Pageable pageable);
 }
