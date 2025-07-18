@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/management/products")
 public class AdminController {
@@ -24,19 +22,11 @@ public class AdminController {
     }
 
     @GetMapping
-    public String showProductManagementPage(
-        Model model,
-        @PageableDefault(size = 10, page = 0,sort = "id", direction = Sort.Direction.DESC)
-        Pageable pageable
-    ) {
+    public String showProductManagementPage(Model model, @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ProductResponseDto> products = productService.findAll(pageable);
         model.addAttribute("products", products);
 
-        String currentSort = pageable.getSort()
-            .stream()
-            .map(order -> order.getProperty() + "," + order.getDirection().name().toLowerCase())
-            .findFirst()
-            .orElse("id,desc");
+        String currentSort = pageable.getSort().stream().map(order -> order.getProperty() + "," + order.getDirection().name().toLowerCase()).findFirst().orElse("id,desc");
 
         model.addAttribute("currentSort", currentSort);
         model.addAttribute("currentSize", pageable.getPageSize());

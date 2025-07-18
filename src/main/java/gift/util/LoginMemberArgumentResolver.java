@@ -1,6 +1,5 @@
 package gift.util;
 
-import gift.config.AuthConstants;
 import gift.controller.LoginMember;
 import gift.exception.InvalidTokenException;
 import gift.exception.UnAuthenticatedException;
