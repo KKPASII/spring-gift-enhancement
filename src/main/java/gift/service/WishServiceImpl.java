@@ -9,6 +9,8 @@ import gift.entity.Product;
 import gift.entity.Wish;
 import gift.repository.ProductRepository;
 import gift.repository.WishRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,21 @@ public class WishServiceImpl implements WishService {
                 wish.getQuantity())
             )
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<WishResponse> findAll(Long memberId, Pageable pageable) {
+        return wishRepository.findAllByMemberId(memberId, pageable)
+            .map(wish -> new WishResponse(
+                wish.getId(),
+                new ProductResponseDto(
+                    wish.getProduct().getId(),
+                    wish.getProduct().getName(),
+                    wish.getProduct().getPrice(),
+                    wish.getProduct().getImageUrl()),
+                wish.getQuantity()
+        ));
     }
 
     @Override
