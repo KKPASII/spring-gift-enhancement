@@ -12,11 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import static gift.config.AuthConstants.BEARER_PREFIX;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
@@ -27,32 +22,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = null;
-
-        // 헤더 확인
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-            token = authHeader.substring(BEARER_PREFIX.length());
-        }
-
-        // 쿠키 확인
-        if (token == null && request.getCookies() != null) {
-            token = Arrays.stream(request.getCookies())
-                .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .findFirst()
-                .map(cookie -> { // 쿠키에서 토큰 추출
-                    try {
-                        String decodedValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
-                        if (decodedValue.startsWith(BEARER_PREFIX)) {
-                            return decodedValue.substring(BEARER_PREFIX.length());
-                        }
-                        return null;
-                    } catch (Exception e) {
-                        throw new UnAuthenticatedException(e.getMessage());
-                    }
-                })
-                .orElse(null);
-        }
+        String token = jwtUtil.extractToken(request);;
 
         if (token == null) {
             throw new UnAuthenticatedException("인증 헤더가 없거나 'Bearer' 타입이 아닙니다.");

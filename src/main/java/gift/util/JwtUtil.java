@@ -5,13 +5,19 @@ import gift.exception.InvalidTokenException;
 import gift.exception.TokenExpiredException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
+
+import static gift.config.AuthConstants.BEARER_PREFIX;
 
 @Component
 public class JwtUtil {
@@ -28,7 +34,7 @@ public class JwtUtil {
 
     public String generateAccessToken(Member member) {
         Date now = new Date();
-        Date expirationTime = new Date(now.getTime() + validityInMilliseconds/2);
+        Date expirationTime = new Date(now.getTime() + validityInMilliseconds / 2);
 
         return Jwts.builder()
             .subject(member.getId().toString())
@@ -53,5 +59,35 @@ public class JwtUtil {
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             throw new InvalidTokenException("유효하지 않은 토큰입니다.");
         }
+    }
+
+    public String extractToken(HttpServletRequest request) {
+        String token = null;
+
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        // 예외를 던지지 않고 유효한 인증 헤더이면 토큰을 substring
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            token = authHeader.substring(BEARER_PREFIX.length());
+        }
+        // 유효한 헤더가 아닐 경우 token은 아직 null이며, 쿠키를 확인한다
+        if (token == null && request.getCookies() != null) {
+            token = Arrays.stream(request.getCookies())
+                .filter(cookie -> "accessToken".equals(cookie.getName()))
+                .findFirst()
+                .map(cookie -> { // 쿠키에서 토큰 추출
+                    try {
+                        String decodedValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
+                        if (decodedValue.startsWith(BEARER_PREFIX)) {
+                            return decodedValue.substring(BEARER_PREFIX.length());
+                        }
+                        return null; // Bearer 타입이 아님
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .orElse(null);
+        }
+
+        return token;
     }
 }

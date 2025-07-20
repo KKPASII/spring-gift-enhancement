@@ -7,18 +7,11 @@ import gift.service.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import static gift.config.AuthConstants.BEARER_PREFIX;
 
 @Component
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
@@ -47,33 +40,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
             throw new IllegalStateException("HttpServletRequest를 가져올 수 없습니다.");
         }
 
-        String token = null;
-
-        String authHeader = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        // 예외를 던지지 않고 유효한 인증 헤더이면 토큰을 substring
-        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-            token = authHeader.substring(BEARER_PREFIX.length());
-        }
-
-        // 유효한 헤더가 아닐 경우 token은 아직 null이며, 쿠키를 확인한다
-        if (token == null && request.getCookies() != null) {
-            token = Arrays.stream(request.getCookies())
-                .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .findFirst()
-                .map(cookie -> { // 쿠키에서 토큰 추출
-                    try {
-                        String decodedValue = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
-                        if (decodedValue.startsWith(BEARER_PREFIX)) {
-                            return decodedValue.substring(BEARER_PREFIX.length());
-                        }
-                        return null; // Bearer 타입이 아님
-                    } catch (Exception e) {
-                        return null;
-                    }
-                })
-                .orElse(null);
-        }
-
+        String token = jwtUtil.extractToken(request);
         // 헤더 검사 & 쿠키 검사 후 토큰을 찾지 못할 경우 예외 발생
         if (token == null) {
             throw new UnAuthenticatedException("인증 토큰이 존재하지 않습니다.");
