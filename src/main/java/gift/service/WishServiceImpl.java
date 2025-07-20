@@ -1,9 +1,6 @@
 package gift.service;
 
-import gift.dto.CreateWishRequest;
-import gift.dto.CreateWishResponse;
-import gift.dto.ProductResponseDto;
-import gift.dto.WishResponse;
+import gift.dto.*;
 import gift.entity.Member;
 import gift.entity.Product;
 import gift.entity.Wish;
@@ -22,10 +19,12 @@ import java.util.List;
 public class WishServiceImpl implements WishService {
     private final WishRepository wishRepository;
     private final ProductRepository productRepository;
+    private final WishMapper wishMapper;
 
-    public WishServiceImpl(WishRepository wishRepository, ProductRepository productRepository) {
+    public WishServiceImpl(WishRepository wishRepository, ProductRepository productRepository, WishMapper wishMapper) {
         this.wishRepository = wishRepository;
         this.productRepository = productRepository;
+        this.wishMapper = wishMapper;
     }
 
     @Override
@@ -55,15 +54,7 @@ public class WishServiceImpl implements WishService {
     public List<WishResponse> findAllWishes(Long memberId) {
         return wishRepository.findAllByMemberId(memberId)
             .stream()
-            .map(wish -> new WishResponse(
-                wish.getId(),
-                new ProductResponseDto(
-                    wish.getProduct().getId(),
-                    wish.getProduct().getName(),
-                    wish.getProduct().getPrice(),
-                    wish.getProduct().getImageUrl()),
-                wish.getQuantity())
-            )
+            .map(wishMapper::toWishResponse)
             .toList();
     }
 
@@ -71,15 +62,7 @@ public class WishServiceImpl implements WishService {
     @Transactional(readOnly = true)
     public Page<WishResponse> findAll(Long memberId, Pageable pageable) {
         return wishRepository.findAllByMemberId(memberId, pageable)
-            .map(wish -> new WishResponse(
-                wish.getId(),
-                new ProductResponseDto(
-                    wish.getProduct().getId(),
-                    wish.getProduct().getName(),
-                    wish.getProduct().getPrice(),
-                    wish.getProduct().getImageUrl()),
-                wish.getQuantity()
-        ));
+            .map(wishMapper::toWishResponse);
     }
 
     @Override
