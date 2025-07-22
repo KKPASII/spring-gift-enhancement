@@ -1,12 +1,12 @@
 package gift.util;
 
-import gift.config.AuthConstants;
 import gift.controller.LoginMember;
 import gift.exception.InvalidTokenException;
+import gift.exception.UnAuthenticatedException;
 import gift.service.MemberService;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -35,12 +35,17 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
         NativeWebRequest webRequest,
         WebDataBinderFactory binderFactory
     ) throws Exception {
-        String authHeader = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith(AuthConstants.BEARER_PREFIX)) {
-            throw new InvalidTokenException("유효하지 않은 인증 헤더입니다.");
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        if (request == null) {
+            throw new IllegalStateException("HttpServletRequest를 가져올 수 없습니다.");
         }
 
-        String token = authHeader.substring(7);
+        String token = jwtUtil.extractToken(request);
+        // 헤더 검사 & 쿠키 검사 후 토큰을 찾지 못할 경우 예외 발생
+        if (token == null) {
+            throw new UnAuthenticatedException("인증 토큰이 존재하지 않습니다.");
+        }
+
         Claims claims = jwtUtil.getClaims(token);
         String email = claims.get("email", String.class);
 
