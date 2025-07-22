@@ -1,10 +1,10 @@
 package gift.product;
 
-import gift.dto.CreateOptionRequest;
-import gift.dto.ProductRequestDto;
-import gift.dto.ProductResponseDto;
-import gift.repository.ProductRepository;
-import gift.service.ProductService;
+import gift.product.dto.CreateOptionRequest;
+import gift.product.dto.ProductRequestDto;
+import gift.product.dto.ProductResponseDto;
+import gift.product.repository.ProductRepository;
+import gift.product.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package gift.admin.controller;
 
-import gift.dto.ProductResponseDto;
-import gift.service.ProductService;
+import gift.product.dto.ProductResponseDto;
+import gift.product.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

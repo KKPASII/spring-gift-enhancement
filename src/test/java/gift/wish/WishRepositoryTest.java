@@ -1,12 +1,12 @@
 package gift.wish;
 
-import gift.entity.Member;
-import gift.entity.Product;
-import gift.entity.Role;
-import gift.entity.Wish;
-import gift.repository.MemberRepository;
-import gift.repository.ProductRepository;
-import gift.repository.WishRepository;
+import gift.member.entity.Member;
+import gift.product.entity.Product;
+import gift.member.entity.Role;
+import gift.member.repository.MemberRepository;
+import gift.product.repository.ProductRepository;
+import gift.wish.entity.Wish;
+import gift.wish.repository.WishRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

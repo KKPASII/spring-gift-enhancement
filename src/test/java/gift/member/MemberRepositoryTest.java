@@ -1,11 +1,8 @@
 package gift.member;
 
-import gift.entity.Member;
-import gift.entity.Product;
-import gift.entity.Role;
-import gift.entity.Wish;
-import gift.repository.MemberRepository;
-import gift.repository.WishRepository;
+import gift.member.entity.Member;
+import gift.member.entity.Role;
+import gift.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

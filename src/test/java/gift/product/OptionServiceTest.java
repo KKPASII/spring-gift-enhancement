@@ -1,10 +1,10 @@
 package gift.product;
 
-import gift.dto.CreateOptionRequest;
-import gift.entity.Product;
-import gift.repository.OptionRepository;
-import gift.repository.ProductRepository;
-import gift.service.OptionService;
+import gift.product.dto.CreateOptionRequest;
+import gift.product.entity.Product;
+import gift.product.repository.OptionRepository;
+import gift.product.repository.ProductRepository;
+import gift.product.service.OptionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
