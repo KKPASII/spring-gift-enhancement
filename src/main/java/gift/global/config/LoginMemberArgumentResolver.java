@@ -1,8 +1,9 @@
-package gift.global.util;
+package gift.global.config;
 
 import gift.auth.controller.LoginMember;
 import gift.global.exception.InvalidTokenException;
 import gift.global.exception.UnAuthenticatedException;
+import gift.global.util.JwtUtil;
 import gift.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
