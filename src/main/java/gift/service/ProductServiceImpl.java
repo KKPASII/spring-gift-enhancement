@@ -2,6 +2,7 @@ package gift.service;
 
 import gift.dto.ProductRequestDto;
 import gift.dto.ProductResponseDto;
+import gift.entity.Option;
 import gift.entity.Product;
 import gift.repository.ProductRepository;
 import gift.validator.ProductValidator;
@@ -28,7 +29,14 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponseDto saveProduct(ProductRequestDto requestDto) {
         productValidator.validateProductName(requestDto.getName());
+
         Product product = new Product(requestDto.getName(), requestDto.getPrice(), requestDto.getImageUrl());
+        requestDto.getOptions().forEach(optionDto -> {
+            product.checkDuplicatedName(optionDto.name());
+            Option option = new Option(optionDto.name(), optionDto.quantity());
+            product.addOption(option);
+        });
+
         Product savedProduct = productRepository.save(product);
         return new ProductResponseDto(savedProduct);
     }

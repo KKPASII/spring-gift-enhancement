@@ -1,8 +1,11 @@
 package gift.controller;
 
+import gift.dto.CreateOptionRequest;
+import gift.dto.OptionResponseDto;
 import gift.dto.ProductRequestDto;
 import gift.dto.ProductResponseDto;
 import gift.repository.ProductRepository;
+import gift.service.OptionService;
 import gift.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -15,10 +18,12 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
     private final ProductService productService;
+    private final OptionService optionService;
     private final ProductRepository productRepository;
 
-    public ProductController(ProductService productService, ProductRepository productRepository) {
+    public ProductController(ProductService productService, OptionService optionService, ProductRepository productRepository) {
         this.productService = productService;
+        this.optionService = optionService;
         this.productRepository = productRepository;
     }
 
@@ -56,5 +61,20 @@ public class ProductController {
     public ResponseEntity<Void> deleteAllProducts() {
         productService.deleteAllProducts();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{productId}/options")
+    public ResponseEntity<List<OptionResponseDto>> getProductOptions(@PathVariable("productId") Long productId) {
+        List<OptionResponseDto> options = optionService.getOptionsByProductId(productId);
+        return new ResponseEntity<>(options, HttpStatus.OK);
+    }
+
+    @PostMapping("/{productId}/options")
+    public ResponseEntity<OptionResponseDto> addOption(
+        @PathVariable("productId") Long productId,
+        @Valid @RequestBody CreateOptionRequest requestDto
+    ) {
+        OptionResponseDto createdOption = optionService.addOptionToProduct(productId, requestDto);
+        return new ResponseEntity<>(createdOption, HttpStatus.CREATED);
     }
 }

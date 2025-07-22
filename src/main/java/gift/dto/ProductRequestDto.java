@@ -1,8 +1,11 @@
 package gift.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
+
+import java.util.List;
 
 public class ProductRequestDto {
     @NotBlank(message = "상품 이름을 반드시 입력해야 합니다.")
@@ -23,7 +26,19 @@ public class ProductRequestDto {
     @Length(min=1, max=1024)
     private String imageUrl;
 
+    @NotNull(message = "상품 옵션 목록은 필수입니다.")
+    @Size(min = 1, message = "반드시 1개 이상의 옵션이 있어야 합니다.")
+    @Valid
+    private List<CreateOptionRequest> options;
+
     public ProductRequestDto() {
+    }
+
+    public ProductRequestDto(String name, int price, String imageUrl, List<CreateOptionRequest> options) {
+        this.name = name;
+        this.price = price;
+        this.imageUrl = imageUrl;
+        this.options = options;
     }
 
     public String getName() {
@@ -36,5 +51,9 @@ public class ProductRequestDto {
 
     public String getImageUrl() {
         return this.imageUrl;
+    }
+
+    public List<CreateOptionRequest> getOptions() {
+        return this.options;
     }
 }

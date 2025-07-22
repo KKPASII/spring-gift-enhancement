@@ -3,6 +3,9 @@ package gift.entity;
 import gift.dto.ProductRequestDto;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 public class Product {
     @Id
@@ -18,12 +21,13 @@ public class Product {
     @Column(name = "image_url", nullable = false, length = 1024)
     private String imageUrl;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Option> options = new ArrayList<>();
+
     protected Product() {}
 
     public Product(String name, int price, String imageUrl) {
-        this.name = name;
-        this.price = price;
-        this.imageUrl = imageUrl;
+        this(null, name, price, imageUrl);
     }
 
     public Product(Long id, String name, int price, String imageUrl) {
@@ -49,9 +53,28 @@ public class Product {
         return this.imageUrl;
     }
 
+    public List<Option> getOptions() {
+        return this.options;
+    }
+
     public void update(ProductRequestDto productRequestDto) {
         this.name = productRequestDto.getName();
         this.price = productRequestDto.getPrice();
         this.imageUrl = productRequestDto.getImageUrl();
+    }
+
+    public void addOption(Option option) {
+        if (!this.options.contains(option)) {
+            this.options.add(option);
+        }
+        option.setProduct(this);
+    }
+
+    public void checkDuplicatedName(String name) {
+        boolean isDuplicated = this.options.stream()
+            .anyMatch(option -> option.getName().equals(name));
+        if (isDuplicated) {
+            throw new IllegalArgumentException("옵션 이름이 이미 존재합니다.");
+        }
     }
 }
